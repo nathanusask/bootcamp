@@ -9,7 +9,7 @@ from logs import LOGGER
 # Get the vector of question
 def extract_features(file_dir, model):
     try:
-        data = pd.read_csv(file_dir)
+        data = pd.read_csv(file_dir, on_bad_lines='skip')
         question_data = data['question'].tolist()
         answer_data = data['answer'].tolist()
         sentence_embeddings = model.sentence_encode(question_data)

@@ -16,6 +16,7 @@ class MySQLHelper():
     def __init__(self):
         self.conn = pymysql.connect(host=MYSQL_HOST, user=MYSQL_USER, port=MYSQL_PORT, password=MYSQL_PWD,
                                     database=MYSQL_DB,
+                                    charset='utf8mb4',
                                     local_infile=True)
         self.cursor = self.conn.cursor()
 
@@ -24,13 +25,14 @@ class MySQLHelper():
             self.conn.ping()
         except Exception:
             self.conn = pymysql.connect(host=MYSQL_HOST, user=MYSQL_USER, port=MYSQL_PORT, password=MYSQL_PWD,
+                                    charset='utf8mb4',
                                     database=MYSQL_DB,local_infile=True)
             self.cursor = self.conn.cursor()
 
     def create_mysql_table(self, table_name):
         # Create mysql table if not exists
         self.test_connection()
-        sql = "create table if not exists " + table_name + " (milvus_id TEXT, question TEXT, answer TEXT);"
+        sql = "create table if not exists " + table_name + " (milvus_id TEXT, question TEXT, answer TEXT) default character set utf8mb4 collate utf8mb4_general_ci;"
         try:
             self.cursor.execute(sql)
             LOGGER.debug(f"MYSQL create table: {table_name} with sql: {sql}")
@@ -42,7 +44,7 @@ class MySQLHelper():
         # Batch insert (Milvus_ids, img_path) to mysql
         self.test_connection()
         sql = "insert into " + table_name + " (milvus_id,question,answer) values (%s,%s,%s);"
-        self.cursor.execute('SET character_set_connection=utf8;')
+        self.cursor.execute('SET character_set_connection=utf8mb4;')
         try:
             self.cursor.executemany(sql, data)
             self.conn.commit()
